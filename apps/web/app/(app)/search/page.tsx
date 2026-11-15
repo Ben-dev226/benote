@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
-import { clean, KIND_ICON } from "@/lib/util";
+import { clean } from "@/lib/util";
+import { KindTile } from "@/components/ui";
+import { FileText } from "lucide-react";
 
 export default async function Search({ searchParams }: { searchParams: { q?: string } }) {
   const { supabase } = await requireUser();
@@ -12,11 +14,11 @@ export default async function Search({ searchParams }: { searchParams: { q?: str
   ]) : [{ data: [] }, { data: [] }, { data: [] }];
   return (
     <>
-      <h1>Recherche : « {q} »</h1>
+      <div className="page-h"><div><h1>Résultats pour « {q} »</h1><p>Apprentissages, notes et ressources.</p></div></div>
       <div className="grid">
-        <div className="card"><h2>Apprentissages</h2>{(s.data ?? []).map((x: { id: string; title: string; icon: string | null }) => <Link key={x.id} className="item" href={`/spaces/${x.id}`}>{x.icon} {x.title}</Link>)}</div>
-        <div className="card"><h2>Notes</h2>{(n.data ?? []).map((x: { id: string; title: string }) => <Link key={x.id} className="item" href={`/notes/${x.id}`}>📝 {x.title || "Sans titre"}</Link>)}</div>
-        <div className="card"><h2>Ressources</h2>{(r.data ?? []).map((x: { id: string; name: string; kind: string }) => <Link key={x.id} className="item" href={`/library/${x.id}`}>{KIND_ICON[x.kind]} {x.name}</Link>)}</div>
+        <div className="card"><h2>Apprentissages</h2>{(s.data ?? []).map((x: { id: string; title: string; icon: string | null }) => <Link key={x.id} className="li" href={`/spaces/${x.id}`}><span className="tile" style={{ background: "var(--sf2)" }}>{x.icon ?? "📘"}</span><span className="li-main"><b>{x.title}</b></span></Link>)}</div>
+        <div className="card"><h2>Notes</h2>{(n.data ?? []).map((x: { id: string; title: string }) => <Link key={x.id} className="li" href={`/notes/${x.id}`}><span className="tile" style={{ background: "var(--sf2)" }}><FileText size={18} /></span><span className="li-main"><b>{x.title || "Sans titre"}</b></span></Link>)}</div>
+        <div className="card"><h2>Ressources</h2>{(r.data ?? []).map((x: { id: string; name: string; kind: string }) => <Link key={x.id} className="li" href={`/library/${x.id}`}><KindTile kind={x.kind} /><span className="li-main"><b>{x.name}</b></span></Link>)}</div>
       </div>
     </>
   );

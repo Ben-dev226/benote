@@ -28,3 +28,10 @@ export async function syncDrive() {
   revalidatePath("/library");
   redirect(`/settings?sync=${missing}`);
 }
+
+export async function toggleTheme() {
+  const { supabase, user } = await requireUser();
+  const { data } = await supabase.from("user_settings").select("theme").eq("user_id", user.id).maybeSingle();
+  await supabase.from("user_settings").update({ theme: data?.theme === "light" ? "dark" : "light" }).eq("user_id", user.id);
+  revalidatePath("/", "layout");
+}

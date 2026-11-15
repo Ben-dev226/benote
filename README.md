@@ -1,4 +1,4 @@
-# myNotebook — version web (étapes 1 à 6)
+# myNotebook — version web (v0.3 : interface refondue)
 
 Plateforme personnelle d'apprentissage (cahier des charges v1.0). **Guide pas à pas : `docs/GUIDE-INSTALLATION.md`.**
 
@@ -12,6 +12,16 @@ Plateforme personnelle d'apprentissage (cahier des charges v1.0). **Guide pas à
 - **Assistant IA facultatif** : 6 agents, passerelle multi-fournisseurs gratuits (Groq / Gemini / OpenRouter) avec bascule automatique, limite 30 requêtes/heure, désactivable
 - **Paramètres** : thème, IA, connexion/révocation Google Drive, vérification des fichiers supprimés
 - Recherche globale, tableau de bord, responsive (barre du bas sur mobile)
+
+## Interface (v0.3)
+- Design inspiré des maquettes : barre latérale, carte Drive, tableau de bord (progression, rappels, actions rapides, activité, compagnon IA), thème clair/sombre en un clic
+- **Un apprentissage = un hub** : notes, ressources, objectifs, rappels et activité au même endroit, avec création « dans le contexte » ; la progression suit automatiquement les objectifs
+- **Notes en deux volets** (liste + éditeur) avec recherche, filtres, favoris, étiquettes ; la liste se met à jour pendant la frappe
+- Bibliothèque par onglets, ajout dans une fenêtre (fichier ou lien), lecteur avec fil d'Ariane et notes liées
+- Rappels groupés (en retard / aujourd'hui / demain / plus tard), bouton « Créer » global, navigation mobile avec bouton + central
+
+## Assistant IA — diagnostic
+Si l'assistant échoue, le message affiche maintenant la cause par fournisseur (clé refusée, quota, modèle indisponible). Si un modèle n'existe plus, la passerelle en découvre automatiquement un autre. Après avoir ajouté ou modifié une clé sur Vercel, **redéployer**.
 
 ## Sécurité
 - RLS sur toutes les tables + vérification en base que chaque référence appartient au même utilisateur (migration 0002)

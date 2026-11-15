@@ -10,7 +10,7 @@ export async function createNote(fd: FormData) {
   const space = str(fd, "space_id") || null;
   const { data } = await supabase.from("notes").insert({ user_id: user.id, space_id: space, title: "Nouvelle note", content: "" }).select("id").single();
   await logActivity(supabase, user.id, "note_created", "note", data?.id, { title: "Nouvelle note" }, space);
-  revalidatePath("/notes"); revalidatePath("/dashboard");
+  revalidatePath("/notes", "layout"); revalidatePath("/dashboard");
   redirect(`/notes/${data?.id}`);
 }
 
@@ -33,7 +33,7 @@ export async function saveNote(id: string, d: { title: string; content: string; 
 export async function deleteNote(fd: FormData) {
   const { supabase } = await requireUser();
   await supabase.from("notes").delete().eq("id", str(fd, "id"));
-  revalidatePath("/notes"); revalidatePath("/dashboard");
+  revalidatePath("/notes", "layout"); revalidatePath("/dashboard");
   redirect("/notes");
 }
 export async function addNoteLink(fd: FormData) {

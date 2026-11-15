@@ -1,12 +1,14 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useDialog } from "@/components/Dialog";
 import { registerDriveFile } from "./actions";
 
-export default function UploadForm({ spaces }: { spaces: { id: string; title: string }[] }) {
+export default function UploadForm({ spaces, defaultSpace }: { spaces: { id: string; title: string }[]; defaultSpace?: string }) {
   const [msg, setMsg] = useState("");
   const [pct, setPct] = useState<number | null>(null);
   const router = useRouter();
+  const dlg = useDialog();
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -19,9 +21,8 @@ export default function UploadForm({ spaces }: { spaces: { id: string; title: st
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: file.name, mimeType: file.type || "application/octet-stream", size: file.size }),
     });
-    const sj = await s.json();
+    const sj = await s.json().catch(() => ({}));
     if (!s.ok) { setMsg(sj.error ?? "Erreur"); setPct(null); return; }
-    // Envoi direct navigateur -> Google Drive
     const driveFile: { id: string } | null = await new Promise((resolve) => {
       const x = new XMLHttpRequest();
       x.open("PUT", sj.uploadUrl);
@@ -35,15 +36,14 @@ export default function UploadForm({ spaces }: { spaces: { id: string; title: st
     const r = await registerDriveFile({ fileId: driveFile.id, spaceId: spaceId || null });
     setPct(null);
     if (!r.ok) { setMsg(r.error ?? "Erreur"); return; }
-    form.reset(); setMsg("Fichier ajouté ✓"); router.refresh();
+    form.reset(); router.refresh(); dlg?.close();
   }
   return (
-    <form onSubmit={onSubmit} className="card stack">
-      <h2>Envoyer un fichier vers mon Drive</h2>
+    <form onSubmit={onSubmit} className="stack" data-keep-open>
       <input type="file" name="file" required />
-      <select name="space_id"><option value="">Sans apprentissage</option>{spaces.map((s) => <option key={s.id} value={s.id}>{s.title}</option>)}</select>
-      <button disabled={pct !== null}>{pct !== null ? `Envoi… ${pct}%` : "Envoyer"}</button>
-      {msg && <div className={msg.includes("✓") ? "ok" : "err"}>{msg}</div>}
+      <select name="space_id" defaultValue={defaultSpace ?? ""}><option value="">Sans apprentissage</option>{spaces.map((s) => <option key={s.id} value={s.id}>{s.title}</option>)}</select>
+      <button disabled={pct !== null}>{pct !== null ? `Envoi vers Drive… ${pct}%` : "Envoyer vers mon Drive"}</button>
+      {msg && <div className="err">{msg}</div>}
     </form>
   );
 }

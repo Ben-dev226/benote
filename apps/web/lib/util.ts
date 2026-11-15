@@ -43,3 +43,28 @@ export function str(fd: FormData, name: string, max = 500) {
   return String(fd.get(name) ?? "").trim().slice(0, max);
 }
 export const clean = (s: string) => s.replace(/[,()%*\\]/g, " ").trim();
+
+const PALETTE = ["#6d5dfc", "#38bdf8", "#34d399", "#fbbf24", "#f472b6", "#fb923c", "#a78bfa", "#2dd4bf"];
+export function colorFor(key: string | null | undefined) {
+  if (!key) return "#8a90c0";
+  let h = 0;
+  for (const c of key) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  return PALETTE[h % PALETTE.length];
+}
+export const KIND_COLOR: Record<string, string> = { document: "#f43f5e", image: "#38bdf8", video: "#ef4444", audio: "#a78bfa", link: "#6d8cff", other: "#9aa1d6" };
+export function ago(d: string) {
+  const s = (Date.now() - new Date(d).getTime()) / 1000;
+  if (s < 60) return "À l’instant";
+  if (s < 3600) return `Il y a ${Math.floor(s / 60)} min`;
+  if (s < 86400) return `Il y a ${Math.floor(s / 3600)} h`;
+  if (s < 172800) return "Hier";
+  return `Il y a ${Math.floor(s / 86400)} j`;
+}
+export function dayBucket(iso: string) {
+  const day = (x: Date) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const diff = Math.round((day(new Date(iso)) - day(new Date())) / 86400000);
+  if (diff < 0) return "En retard";
+  if (diff === 0) return "Aujourd’hui";
+  if (diff === 1) return "Demain";
+  return "Plus tard";
+}

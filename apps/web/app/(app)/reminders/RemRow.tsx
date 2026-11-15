@@ -1,14 +1,17 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { Check, Repeat, Trash2 } from "lucide-react";
 import { deleteReminder, toggleReminder } from "./actions";
 
-export default function RemRow({ id, title, when, done, rec, space }: { id: string; title: string; when: string; done: boolean; rec: string | null; space: string }) {
+export default function RemRow({ id, title, when, done, rec, space, color }: { id: string; title: string; when: string; done: boolean; rec: string | null; space: string; color: string }) {
   const router = useRouter();
   return (
-    <div className="row between item">
-      <span className="row"><input type="checkbox" checked={done} style={{ width: "auto" }} onChange={async () => { await toggleReminder(id); router.refresh(); }} />
-        <span style={{ opacity: done ? 0.5 : 1 }}>{title}<div className="mu">{when} {rec ? "· 🔁" : ""} {space}</div></span></span>
-      <button className="ghost" onClick={async () => { await deleteReminder(id); router.refresh(); }}>✕</button>
+    <div className="li">
+      <button className="btn-icon" aria-label="Terminé" style={{ borderRadius: "50%", background: done ? "var(--ok)" : "transparent", color: done ? "#052e1b" : "var(--mu)" }}
+        onClick={async () => { await toggleReminder(id); router.refresh(); }}><Check size={14} /></button>
+      <span className="li-main" style={{ opacity: done ? 0.5 : 1 }}><span className="t" style={{ textDecoration: done ? "line-through" : "none" }}>{title}</span><span className="mu">{when} {rec && <Repeat size={11} style={{ verticalAlign: "middle" }} />}</span></span>
+      {space && <span className="chip" style={{ "--c": color } as React.CSSProperties}><i />{space}</span>}
+      <button className="btn-icon" aria-label="Supprimer" onClick={async () => { await deleteReminder(id); router.refresh(); }}><Trash2 size={14} /></button>
     </div>
   );
 }

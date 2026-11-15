@@ -13,8 +13,7 @@ export default async function MapPage() {
   const ls = ((links.data ?? []) as { from_note_id: string; to_note_id: string }[]).map((l) => ({ a: l.from_note_id, b: l.to_note_id }));
   return (
     <>
-      <h1>Carte de connaissances</h1>
-      <p className="mu">Chaque point est une note (couleur = apprentissage). Les traits sont les liens entre notes ; clique pour ouvrir.</p>
+      <div className="page-h"><div><h1>Carte de connaissances</h1><p>Chaque point est une note (couleur = apprentissage). Les traits sont les liens que tu crées entre tes notes ; clique pour ouvrir.</p></div></div>
       <KnowledgeMap nodes={nodes} links={ls} />
     </>
   );

@@ -1,7 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { AGENTS } from "@/lib/ai/agents";
-import { availableProviders, complete } from "@/lib/ai/gateway";
+import { availableProviders, complete, GatewayError } from "@/lib/ai/gateway";
+
+export const maxDuration = 30;
 
 const LIMIT_PER_HOUR = 30;
 
@@ -33,7 +35,8 @@ export async function POST(request: NextRequest) {
     await supabase.from("ai_tasks").insert({ user_id: user.id, agent_id: ag?.id ?? null, status: "done", input: { prompt, noteId: b?.noteId ?? null }, output: out });
     return NextResponse.json(out);
   } catch (e) {
-    await supabase.from("ai_tasks").insert({ user_id: user.id, agent_id: ag?.id ?? null, status: "failed", input: { prompt } });
-    return NextResponse.json({ error: "Aucun fournisseur disponible pour l’instant. Le reste de l’application fonctionne normalement.", detail: String(e) }, { status: 503 });
+    const attempts = e instanceof GatewayError ? e.attempts : [];
+    await supabase.from("ai_tasks").insert({ user_id: user.id, agent_id: ag?.id ?? null, status: "failed", input: { prompt }, output: { attempts } });
+    return NextResponse.json({ error: "Aucun fournisseur IA n’a répondu. Le reste de l’application fonctionne normalement.", attempts }, { status: 503 });
   }
 }

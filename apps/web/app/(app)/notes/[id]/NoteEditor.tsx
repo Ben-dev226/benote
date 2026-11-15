@@ -23,6 +23,7 @@ export default function NoteEditor(p: Props) {
     const t = setTimeout(async () => {
       const r = await saveNote(p.id, { title, content, spaceId: spaceId || null, favorite, tags: tags.split(",") });
       setStatus(r.ok ? "Enregistré ✓" : "Erreur d’enregistrement");
+      window.dispatchEvent(new CustomEvent("note-saved", { detail: { id: p.id, title, content, favorite, spaceId: spaceId || null } }));
     }, 800);
     return () => clearTimeout(t);
   }, [p.id, title, content, spaceId, favorite, tags]);
@@ -56,7 +57,7 @@ export default function NoteEditor(p: Props) {
         <button className="ghost" onClick={() => wrap("[", "](https://)")}>🔗</button>
         <button className="ghost" onClick={() => wrap("![", "](https://)")}>🖼️</button>
         <button className={preview ? "" : "ghost"} onClick={() => setPreview(!preview)}>{preview ? "Éditer" : "Aperçu"}</button>
-        <span className="mu">{status}</span>
+        <span className="mu" style={{ marginLeft: "auto" }}>{status}</span>
       </div>
       {preview
         ? <div className="md" dangerouslySetInnerHTML={{ __html: html }} />

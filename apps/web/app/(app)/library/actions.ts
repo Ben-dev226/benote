@@ -96,6 +96,6 @@ export async function createLinkedNote(resourceId: string, d: { text: string; pa
   if (!note) return { ok: false };
   await supabase.from("resource_links").insert({ user_id: user.id, note_id: note.id, resource_id: resourceId, page: d.page ?? null, timestamp_s: d.seconds ?? null });
   await logActivity(supabase, user.id, "note_created", "note", note.id, { title: `Note — ${r.name}` }, r.space_id);
-  revalidatePath(`/library/${resourceId}`); revalidatePath("/notes"); revalidatePath("/dashboard");
+  revalidatePath(`/library/${resourceId}`); revalidatePath("/notes", "layout"); revalidatePath("/dashboard");
   return { ok: true };
 }

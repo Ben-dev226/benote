@@ -3,7 +3,10 @@ import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import ConfirmButton from "@/components/ConfirmButton";
 import QuickNote from "@/components/QuickNote";
-import { fmtSize, fmtTime, KIND_ICON, KIND_LABEL, youtubeId } from "@/lib/util";
+import { fmtSize, fmtTime, KIND_LABEL, youtubeId } from "@/lib/util";
+import { KindTile, SpaceChip } from "@/components/ui";
+import SubmitButton from "@/components/SubmitButton";
+import { FileText, Trash2 } from "lucide-react";
 import { deleteResource, updateResource } from "../actions";
 import PdfViewer from "./PdfViewer";
 import MediaPlayer from "./MediaPlayer";
@@ -30,6 +33,7 @@ export default async function Reader({ params, searchParams }: { params: { id: s
   const ix = imgIds.indexOf(r.id);
   const bookmarks = ((anns.data ?? []) as { id: string; page: number; data: { type?: string } | null }[]).filter((a) => a.data?.type === "bookmark").map((a) => ({ id: a.id, page: a.page }));
   const isPdf = r.mime_type === "application/pdf";
+  const space = ((spaces.data ?? []) as { id: string; title: string }[]).find((x) => x.id === r.space_id) ?? null;
 
   let viewer: React.ReactNode;
   if (r.drive_status === "missing") viewer = <div className="card err">Ce fichier n’existe plus dans ton Google Drive.</div>;
@@ -48,28 +52,35 @@ export default async function Reader({ params, searchParams }: { params: { id: s
 
   return (
     <>
-      <div className="head"><h1>{KIND_ICON[r.kind]} {r.name}</h1><Link href="/library" className="btn ghost">← Bibliothèque</Link></div>
-      <div className="split wide">
+      <div className="crumbs"><Link href="/library">Bibliothèque</Link> / {space && <><Link href={`/spaces/${space.id}`}>{space.title}</Link> / </>}<span>{r.name}</span></div>
+      <div className="row between" style={{ marginBottom: 14 }}>
+        <div className="row" style={{ flexWrap: "nowrap" }}><KindTile kind={r.kind} /><div><h1 style={{ fontSize: 22 }}>{r.name}</h1><span className="mu">{KIND_LABEL[r.kind]} {fmtSize(r.size_bytes)} {prog.data?.percent != null ? `· lu à ${prog.data.percent}%` : ""}</span></div></div>
+        <SpaceChip space={space} />
+      </div>
+      <div className="split">
         <div>{viewer}</div>
-        <div className="stack">
-          <form action={updateResource} className="card stack">
-            <input type="hidden" name="id" value={r.id} />
-            <input name="name" defaultValue={r.name} />
-            <textarea name="description" rows={2} defaultValue={r.description ?? ""} placeholder="Description personnelle" />
-            <select name="space_id" defaultValue={r.space_id ?? ""}><option value="">Sans apprentissage</option>
-              {(spaces.data ?? []).map((s: { id: string; title: string }) => <option key={s.id} value={s.id}>{s.title}</option>)}</select>
-            <span className="mu">{KIND_LABEL[r.kind]} {fmtSize(r.size_bytes)} {prog.data?.percent != null ? `· lu à ${prog.data.percent}%` : ""}</span>
-            <button>Enregistrer</button>
-          </form>
-          <div className="card stack"><h2>Notes liées</h2>
-            {(links.data ?? []).length === 0 && <span className="mu">Aucune note.</span>}
+        <div className="stack" style={{ gap: 14 }}>
+          <div className="card stack">
+            <h2>Notes liées</h2>
+            {(links.data ?? []).length === 0 && <span className="mu">Aucune note. Écris-en une depuis le lecteur : elle sera reliée à cette ressource.</span>}
             {((links.data ?? []) as unknown as { id: string; page: number | null; timestamp_s: number | null; notes: { id: string; title: string } | { id: string; title: string }[] | null }[]).map((l) => {
               const n = one(l.notes); if (!n) return null;
-              return <Link key={l.id} href={`/notes/${n.id}`}>📝 {n.title} <span className="mu">{l.page ? `p. ${l.page}` : l.timestamp_s !== null ? fmtTime(l.timestamp_s) : ""}</span></Link>;
+              return <Link key={l.id} href={`/notes/${n.id}`} className="li"><span className="tile" style={{ background: "var(--sf2)", width: 34, height: 34 }}><FileText size={16} /></span><span className="li-main"><b>{n.title}</b><span className="mu">{l.page ? `page ${l.page}` : l.timestamp_s !== null ? `à ${fmtTime(l.timestamp_s)}` : ""}</span></span></Link>;
             })}
           </div>
+          <details className="acc">
+            <summary>Informations et organisation</summary>
+            <form action={updateResource} className="stack" style={{ marginTop: 10 }}>
+              <input type="hidden" name="id" value={r.id} />
+              <input name="name" defaultValue={r.name} />
+              <textarea name="description" rows={2} defaultValue={r.description ?? ""} placeholder="Description personnelle" />
+              <select name="space_id" defaultValue={r.space_id ?? ""}><option value="">Sans apprentissage</option>
+                {(spaces.data ?? []).map((x: { id: string; title: string }) => <option key={x.id} value={x.id}>{x.title}</option>)}</select>
+              <SubmitButton>Enregistrer</SubmitButton>
+            </form>
+          </details>
           <form action={deleteResource}><input type="hidden" name="id" value={r.id} />
-            <ConfirmButton message="Supprimer cette ressource (et le fichier dans ton Drive) ?" className="danger">Supprimer</ConfirmButton></form>
+            <ConfirmButton message="Supprimer cette ressource (et le fichier dans ton Drive) ?" className="danger"><Trash2 size={15} />Supprimer</ConfirmButton></form>
         </div>
       </div>
     </>

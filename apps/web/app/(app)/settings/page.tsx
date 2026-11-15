@@ -12,7 +12,7 @@ export default async function Settings({ searchParams }: { searchParams: { googl
   const [{ data: st }, drive] = await Promise.all([supabase.from("user_settings").select("theme,ai_enabled").maybeSingle(), driveInfo(user.id)]);
   return (
     <>
-      <h1>Paramètres</h1>
+      <div className="page-h"><div><h1>Paramètres</h1><p>Apparence, assistant IA, Google Drive et compte.</p></div></div>
       <div className="grid">
         <form action={updateSettings} className="card stack">
           <h2>Apparence et IA</h2>
