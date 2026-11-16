@@ -3,6 +3,7 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useDialog } from "@/components/Dialog";
 import { createReminder } from "./actions";
+import { toast } from "@/lib/toast";
 
 export default function ReminderForm({ spaces, fixedSpace }: { spaces: { id: string; title: string }[]; fixedSpace?: string }) {
   const [pending, start] = useTransition();
@@ -16,7 +17,7 @@ export default function ReminderForm({ spaces, fixedSpace }: { spaces: { id: str
       const local = String(fd.get("local") ?? "");
       if (!local) return;
       fd.set("remind_at", new Date(local).toISOString()); // heure locale du navigateur -> UTC
-      start(async () => { await createReminder(fd); form.reset(); router.refresh(); dlg?.close(); });
+      start(async () => { await createReminder(fd); form.reset(); toast("Rappel créé"); router.refresh(); dlg?.close(); });
     }}>
       <input name="title" placeholder="Ex. Réviser le modèle OSI" required autoFocus />
       <input name="local" type="datetime-local" required />

@@ -44,14 +44,14 @@ export function str(fd: FormData, name: string, max = 500) {
 }
 export const clean = (s: string) => s.replace(/[,()%*\\]/g, " ").trim();
 
-const PALETTE = ["#6d5dfc", "#38bdf8", "#34d399", "#fbbf24", "#f472b6", "#fb923c", "#a78bfa", "#2dd4bf"];
+const PALETTE = ["#3b5bdb", "#0ca678", "#e8590c", "#9c36b5", "#d6336c", "#1098ad", "#e67700", "#5f3dc4"];
 export function colorFor(key: string | null | undefined) {
   if (!key) return "#8a90c0";
   let h = 0;
   for (const c of key) h = (h * 31 + c.charCodeAt(0)) >>> 0;
   return PALETTE[h % PALETTE.length];
 }
-export const KIND_COLOR: Record<string, string> = { document: "#f43f5e", image: "#38bdf8", video: "#ef4444", audio: "#a78bfa", link: "#6d8cff", other: "#9aa1d6" };
+export const KIND_COLOR: Record<string, string> = { document: "#d6336c", image: "#1098ad", video: "#e8590c", audio: "#9c36b5", link: "#3b5bdb", other: "#868e96" };
 export function ago(d: string) {
   const s = (Date.now() - new Date(d).getTime()) / 1000;
   if (s < 60) return "À l’instant";
@@ -67,4 +67,9 @@ export function dayBucket(iso: string) {
   if (diff === 0) return "Aujourd’hui";
   if (diff === 1) return "Demain";
   return "Plus tard";
+}
+
+export function longDate(d = new Date()) {
+  const t = d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
+  return t.charAt(0).toUpperCase() + t.slice(1);
 }

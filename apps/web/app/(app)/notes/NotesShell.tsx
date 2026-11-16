@@ -34,22 +34,22 @@ export default function NotesShell({ notes, spaces, children }: { notes: NoteIte
 
   return (
     <div className={`notes-shell ${open ? "open" : ""}`}>
-      <aside className="card nlist stack">
-        <div className="row between"><h2>Mes notes</h2>
+      <aside className="nlist">
+        <div className="row between"><h1 style={{ fontSize: 26 }}>Notes</h1>
           <form action={createNote}><button className="btn btn-sm"><Plus size={15} /> Nouvelle</button></form></div>
-        <div className="search" style={{ maxWidth: "none" }}><Search size={15} /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Rechercher" /></div>
+        <div className="search"><Search size={15} /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Rechercher" /></div>
         <div className="row">
           <select value={space} onChange={(e) => setSpace(e.target.value)} style={{ flex: 1 }}><option value="">Tous les apprentissages</option>{spaces.map((s) => <option key={s.id} value={s.id}>{s.title}</option>)}</select>
-          <button className={fav ? "btn-icon" : "btn-icon"} style={fav ? { background: "var(--wa)", color: "#3a2a00" } : undefined} onClick={() => setFav(!fav)} aria-label="Favoris"><Star size={16} /></button>
+          <button className="btn-icon" style={fav ? { background: "var(--hl)", color: "var(--hl-ink)" } : undefined} onClick={() => setFav(!fav)} aria-label="Favoris"><Star size={16} /></button>
         </div>
-        {allTags.length > 0 && <div className="row">{allTags.slice(0, 12).map((t) => <button key={t} className="tag" style={tag === t ? { background: "var(--ac)", color: "#fff" } : { border: 0 }} onClick={() => setTag(tag === t ? "" : t)}>#{t}</button>)}</div>}
+        {allTags.length > 0 && <div className="row">{allTags.slice(0, 12).map((t) => <button key={t} className="tag" style={tag === t ? { background: "var(--accent)", color: "var(--accent-ink)" } : { border: 0 }} onClick={() => setTag(tag === t ? "" : t)}>#{t}</button>)}</div>}
         <div className="stack" style={{ gap: 2 }}>
           {shown.map((n) => (
             <Link key={n.id} href={`/notes/${n.id}`} className={`nitem ${path === `/notes/${n.id}` ? "on" : ""}`}>
               <b>{n.favorite ? "⭐ " : ""}{n.title || "Sans titre"}</b>
               <div className="mu clamp">{n.excerpt || "Note vide"}</div>
               <div className="row" style={{ gap: 6 }}>
-                {n.spaceId && <span className="chip" style={{ "--c": colorFor(n.spaceId) } as React.CSSProperties}><i />{spaces.find((s) => s.id === n.spaceId)?.title}</span>}
+                {n.spaceId && <span className="chip" style={{ "--c": colorFor(n.spaceId) } as React.CSSProperties}>{spaces.find((s) => s.id === n.spaceId)?.title}</span>}
                 <span className="mu">{ago(n.updatedAt)}</span>
               </div>
             </Link>

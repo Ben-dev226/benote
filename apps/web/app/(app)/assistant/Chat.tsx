@@ -39,13 +39,13 @@ export default function Chat({ agents, notes, initial, presetAgent, presetPrompt
         <select value={agent} onChange={(e) => setAgent(e.target.value)}>{agents.map((a) => <option key={a.slug} value={a.slug}>{a.label}</option>)}</select>
         <select value={noteId} onChange={(e) => setNoteId(e.target.value)} style={{ flex: 1 }}><option value="">Sans note en contexte</option>{notes.map((n) => <option key={n.id} value={n.id}>📝 {n.title || "Sans titre"}</option>)}</select>
       </div>
-      <div className="card chat">
+      <div className="panel chat">
         {msgs.length === 0 && <div className="row" style={{ flexWrap: "nowrap" }}><span className="bot"><Bot size={30} /></span><span className="mu">Salut ! Choisis une note en contexte si tu veux que je travaille dessus, puis pose ta question.</span></div>}
         {msgs.map((m, i) => <div key={i} className={`bubble ${m.role}`}>{m.text}</div>)}
         {busy && <div className="mu">L’assistant réfléchit…</div>}
         <div ref={end} />
       </div>
-      <div className="row">{chips.map(([l, a, p]) => <button key={l} className="tag" style={{ border: 0 }} onClick={() => { setAgent(a); setPrompt(p); }}>{l}</button>)}</div>
+      <div className="row">{chips.map(([l, a, p]) => <button key={l} className="tag" style={{ border: 0, cursor: "pointer" }} onClick={() => { setAgent(a); setPrompt(p); }}>{l}</button>)}</div>
       <div className="row" style={{ flexWrap: "nowrap" }}><input value={prompt} onChange={(e) => setPrompt(e.target.value)} onKeyDown={(e) => e.key === "Enter" && send()} placeholder="Pose ta question…" /><button onClick={() => send()} disabled={busy} aria-label="Envoyer"><Send size={16} /></button></div>
     </div>
   );

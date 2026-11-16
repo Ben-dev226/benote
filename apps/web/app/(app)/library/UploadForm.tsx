@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDialog } from "@/components/Dialog";
 import { registerDriveFile } from "./actions";
+import { toast } from "@/lib/toast";
 
 export default function UploadForm({ spaces, defaultSpace }: { spaces: { id: string; title: string }[]; defaultSpace?: string }) {
   const [msg, setMsg] = useState("");
@@ -36,7 +37,7 @@ export default function UploadForm({ spaces, defaultSpace }: { spaces: { id: str
     const r = await registerDriveFile({ fileId: driveFile.id, spaceId: spaceId || null });
     setPct(null);
     if (!r.ok) { setMsg(r.error ?? "Erreur"); return; }
-    form.reset(); router.refresh(); dlg?.close();
+    form.reset(); toast("Fichier ajouté à ton Drive"); router.refresh(); dlg?.close();
   }
   return (
     <form onSubmit={onSubmit} className="stack" data-keep-open>

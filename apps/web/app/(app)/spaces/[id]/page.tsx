@@ -5,7 +5,7 @@ import { requireUser } from "@/lib/auth";
 import ConfirmButton from "@/components/ConfirmButton";
 import Dialog from "@/components/Dialog";
 import SubmitButton from "@/components/SubmitButton";
-import { Empty, KindTile, ProgressRing } from "@/components/ui";
+import { Empty, KindTile } from "@/components/ui";
 import ReminderForm from "../../reminders/ReminderForm";
 import { createNote } from "../../notes/actions";
 import { addGoal, deleteGoal, deleteSpace, setSpaceStatus, toggleGoal, updateSpace } from "../actions";
@@ -27,41 +27,41 @@ export default async function SpaceHub({ params }: { params: { id: string } }) {
   const color = colorFor(s.id);
   return (
     <div style={{ "--c": color } as React.CSSProperties}>
-      <div className="crumbs"><Link href="/spaces">Mes apprentissages</Link> / <span>{s.title}</span></div>
-      <div className="card row between" style={{ marginBottom: 16, borderColor: color }}>
-        <div className="row" style={{ gap: 16, flexWrap: "nowrap" }}>
-          <ProgressRing value={s.progress} color={color} size={78} />
-          <div><h1>{s.icon} {s.title}</h1><p className="mu" style={{ margin: "4px 0 0" }}>{[s.category, s.description].filter(Boolean).join(" · ")}</p></div>
-        </div>
+      <div className="strip" />
+      <div className="crumbs"><Link href="/spaces">Apprentissages</Link> / <span>{s.title}</span></div>
+      <div className="page-h">
+        <div><h1>{s.icon} {s.title}</h1>
+          <p>{[s.category, s.description].filter(Boolean).join(" — ")}</p>
+          <div style={{ maxWidth: 320 }}><div className="bar"><i style={{ width: `${s.progress}%` }} /></div><span className="mu">{s.progress} % {gl.length > 0 ? `· ${gl.filter((g) => g.done).length} objectif(s) sur ${gl.length}` : ""}</span></div></div>
         <div className="row">
           <form action={createNote}><input type="hidden" name="space_id" value={s.id} /><SubmitButton><FileText size={16} /> Note</SubmitButton></form>
-          <Link className="btn" href={`/library?add=1&space=${s.id}`}><FolderPlus size={16} /> Ressource</Link>
+          <Link className="btn ghost" href={`/library?add=1&space=${s.id}`}><FolderPlus size={16} /> Ressource</Link>
           <Dialog className="btn ghost" trigger={<><Bell size={16} /> Rappel</>} title="Nouveau rappel"><ReminderForm spaces={[{ id: s.id, title: s.title }]} fixedSpace={s.id} /></Dialog>
-          <Dialog className="btn ghost" trigger={<Pencil size={16} />} title="Modifier l’apprentissage">
+          <Dialog className="btn-icon" trigger={<Pencil size={16} />} title="Modifier l’apprentissage">
             <form action={updateSpace} className="stack">
               <input type="hidden" name="id" value={s.id} />
               <input name="title" defaultValue={s.title} required />
               <input name="description" defaultValue={s.description ?? ""} placeholder="Description" />
               <div className="row"><input name="category" defaultValue={s.category ?? ""} placeholder="Catégorie" style={{ flex: 1 }} /><input name="icon" defaultValue={s.icon ?? ""} placeholder="Emoji" style={{ width: 90 }} /></div>
               {gl.length === 0 ? <label className="mu">Progression : <input type="number" name="progress" min={0} max={100} defaultValue={s.progress} style={{ width: 80 }} /> %</label>
-                : <span className="mu">La progression est calculée automatiquement à partir des objectifs.</span>}
+                : <span className="mu">La progression est calculée à partir des objectifs cochés.</span>}
               <SubmitButton>Enregistrer</SubmitButton>
             </form>
           </Dialog>
         </div>
       </div>
 
-      <div className="split">
+      <div className="cols">
         <div className="stack" style={{ gap: 16 }}>
           <div className="card">
-            <div className="card-h"><h2>Notes ({(notes.data ?? []).length})</h2></div>
+            <div className="card-h"><h2 className="sec-t">Notes ({(notes.data ?? []).length})</h2></div>
             {(notes.data ?? []).length === 0 && <Empty icon={<FileText size={22} />} title="Aucune note" >Utilise le bouton « Note » ci-dessus.</Empty>}
             {(notes.data ?? []).map((n: { id: string; title: string; updated_at: string }) => (
               <Link key={n.id} href={`/notes/${n.id}`} className="li"><span className="tile" style={{ background: `${color}26`, color }}><FileText size={18} /></span><span className="li-main"><b>{n.title || "Sans titre"}</b><span className="mu">{ago(n.updated_at)}</span></span></Link>
             ))}
           </div>
           <div className="card">
-            <div className="card-h"><h2>Ressources ({(res.data ?? []).length})</h2></div>
+            <div className="card-h"><h2 className="sec-t">Ressources ({(res.data ?? []).length})</h2></div>
             {(res.data ?? []).length === 0 && <Empty icon={<FolderPlus size={22} />} title="Aucune ressource">Ajoute un PDF, une vidéo ou un lien avec le bouton « Ressource ».</Empty>}
             {(res.data ?? []).map((r: { id: string; name: string; kind: string; created_at: string }) => (
               <Link key={r.id} href={`/library/${r.id}`} className="li"><KindTile kind={r.kind} /><span className="li-main"><b>{r.name}</b><span className="mu">Ajouté le {fmtDate(r.created_at)}</span></span></Link>

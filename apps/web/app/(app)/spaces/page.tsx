@@ -21,36 +21,36 @@ export default async function Spaces({ searchParams }: { searchParams: { archive
   return (
     <>
       <div className="page-h">
-        <div><h1>{arch ? "Apprentissages archivés" : "Mes apprentissages"}</h1><p>Chaque apprentissage rassemble ses notes, ses ressources, ses objectifs et ses rappels.</p></div>
+        <div><h1>{arch ? "Apprentissages archivés" : "Apprentissages"}</h1><p>Un espace par sujet : tout ce qui s’y rapporte reste au même endroit.</p></div>
         <div className="row">
           <Link className="btn ghost" href={arch ? "/spaces" : "/spaces?archived=1"}>{arch ? "Voir les actifs" : "Archives"}</Link>
           {!arch && (
-            <Dialog trigger={<><Plus size={16} /> Nouvel apprentissage</>} title="Nouvel apprentissage" defaultOpen={searchParams.new === "1"}>
+            <Dialog trigger={<><Plus size={16} /> Nouveau</>} title="Nouvel apprentissage" defaultOpen={searchParams.new === "1"}>
               <form action={createSpace} className="stack">
                 <input name="title" placeholder="Titre (ex. Réseaux informatiques)" required maxLength={120} autoFocus />
                 <input name="description" placeholder="Description" maxLength={500} />
                 <div className="row"><input name="category" placeholder="Catégorie" maxLength={60} style={{ flex: 1 }} /><input name="icon" placeholder="Emoji" maxLength={8} style={{ width: 90 }} /></div>
-                <SubmitButton>Créer l’apprentissage</SubmitButton>
+                <SubmitButton>Créer</SubmitButton>
               </form>
             </Dialog>
           )}
         </div>
       </div>
-      {list.length === 0 ? <div className="card"><Empty icon={<GraduationCap size={24} />} title={arch ? "Aucune archive" : "Aucun apprentissage"}>Crée ton premier espace pour y ranger notes et ressources.</Empty></div> : (
-        <div className="grid">
+      {list.length === 0 ? <Empty icon={<GraduationCap size={20} />} title={arch ? "Aucune archive" : "Aucun apprentissage"}>Un apprentissage rassemble les notes, ressources, objectifs et rappels d’un même sujet.</Empty> : (
+        <div>
           {list.map((s) => (
-            <div className="card" key={s.id} style={{ "--c": colorFor(s.id) } as React.CSSProperties}>
-              <Link href={`/spaces/${s.id}`} className="stack" style={{ gap: 4 }}>
-                <b style={{ fontSize: 17 }}>{s.icon} {s.title}</b>
-                <span className="mu">{[s.category, s.description].filter(Boolean).join(" · ")}</span>
-                <div className="bar"><i style={{ width: `${s.progress}%` }} /></div>
+            <div className="sp-row" key={s.id} style={{ "--c": colorFor(s.id) } as React.CSSProperties}>
+              <span className="tab" />
+              <Link href={`/spaces/${s.id}`} style={{ flex: 1, minWidth: 0 }}>
+                <h2>{s.icon} {s.title}</h2>
+                <span className="mu">{[s.category, s.description].filter(Boolean).join(" — ") || "Pas de description"}</span>
+                <div className="bar" style={{ maxWidth: 360 }}><i style={{ width: `${s.progress}%` }} /></div>
               </Link>
-              <div className="row between"><span className="mu">{s.progress}% · {count(res.data, s.id)} ressources · {count(notes.data, s.id)} notes</span>
-                {!arch && <span className="row" style={{ gap: 4 }}>
-                  <form action={moveSpace}><input type="hidden" name="id" value={s.id} /><input type="hidden" name="dir" value="up" /><button className="btn-icon" aria-label="Monter"><ArrowUp size={14} /></button></form>
-                  <form action={moveSpace}><input type="hidden" name="id" value={s.id} /><input type="hidden" name="dir" value="down" /><button className="btn-icon" aria-label="Descendre"><ArrowDown size={14} /></button></form>
-                </span>}
-              </div>
+              <span className="mu" style={{ textAlign: "right", whiteSpace: "nowrap" }}>{s.progress} %<br />{count(notes.data, s.id)} notes · {count(res.data, s.id)} ressources</span>
+              {!arch && <span className="row" style={{ gap: 0, flexWrap: "nowrap" }}>
+                <form action={moveSpace}><input type="hidden" name="id" value={s.id} /><input type="hidden" name="dir" value="up" /><button className="btn-icon sm" aria-label="Monter"><ArrowUp size={14} /></button></form>
+                <form action={moveSpace}><input type="hidden" name="id" value={s.id} /><input type="hidden" name="dir" value="down" /><button className="btn-icon sm" aria-label="Descendre"><ArrowDown size={14} /></button></form>
+              </span>}
             </div>
           ))}
         </div>
